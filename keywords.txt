@@ -1,0 +1,59 @@
+#######################################
+# Syntax Coloring Map for STEMBuddy
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+STEMBuddy	KEYWORD1
+STEMBuddyLED	KEYWORD1
+STEMBuddyLCD	KEYWORD1
+STEMBuddyServo	KEYWORD1
+STEMBuddyMotor	KEYWORD1
+STEMBuddyBuzzer	KEYWORD1
+STEMBuddyScope	KEYWORD1
+STEMBuddySensor	KEYWORD1
+STEMBuddyInput	KEYWORD1
+STEMBuddyTTS	KEYWORD1
+STEMBuddyTerminal	KEYWORD1
+STEMBuddyCamera	KEYWORD1
+STEMBuddyNotify	KEYWORD1
+STEMBuddySMS	KEYWORD1
+STEMBuddyDataLog	KEYWORD1
+STEMBuddyPiano	KEYWORD1
+STEMBuddyInternet	KEYWORD1
+STEMBuddyAudio	KEYWORD1
+STEMBuddySpeech	KEYWORD1
+STEMBuddyNFC	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+update	KEYWORD2
+isConnected	KEYWORD2
+reset	KEYWORD2
+sendCommand	KEYWORD2
+on	KEYWORD2
+off	KEYWORD2
+setColor	KEYWORD2
+setBrightness	KEYWORD2
+print	KEYWORD2
+clear	KEYWORD2
+setCursor	KEYWORD2
+setAngle	KEYWORD2
+setSpeed	KEYWORD2
+tone	KEYWORD2
+noTone	KEYWORD2
+melody	KEYWORD2
+speak	KEYWORD2
+send	KEYWORD2
+capture	KEYWORD2
+log	KEYWORD2
+plot	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
