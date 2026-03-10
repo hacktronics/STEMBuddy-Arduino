@@ -35,7 +35,7 @@ Your phone becomes the component. Students don't need to buy LEDs, LCDs, or sens
 ### PlatformIO
 Add to your `platformio.ini`:
 ```ini
-lib_deps = hacktronics/STEMBuddy
+lib_deps = hacktronics/STEMBuddy-Arduino
 ```
 
 ## Quick Start
@@ -112,7 +112,7 @@ Open them in Arduino IDE via **File > Examples > STEMBuddy**.
 
 ## Protocol
 
-See [PROTOCOL.md](PROTOCOL.md) for the full BLE command protocol specification.
+See [PROTOCOL.md](docs/PROTOCOL.md) for the full BLE command protocol specification.
 
 ## License
 
