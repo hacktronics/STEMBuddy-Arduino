@@ -50,6 +50,14 @@
 #include "STEMBuddyAudio.h"
 #include "STEMBuddySpeech.h"
 #include "STEMBuddyNFC.h"
+#include "STEMBuddySpeaker.h"
+#include "STEMBuddyGPIO.h"
+#include "STEMBuddySegment7.h"
+#include "STEMBuddyBarGraph.h"
+#include "STEMBuddyStepper.h"
+#include "STEMBuddyMAX7219.h"
+#include "STEMBuddyRFID.h"
+#include "STEMBuddySwitch.h"
 
 class STEMBuddy : public BLEServerCallbacks, public BLECharacteristicCallbacks {
 public:
@@ -73,6 +81,14 @@ public:
     STEMBuddyAudio    audio;
     STEMBuddySpeech   speech;
     STEMBuddyNFC      nfc;
+    STEMBuddySpeaker  speaker;
+    STEMBuddyGPIO     gpio;
+    STEMBuddySegment7 segment7;
+    STEMBuddyBarGraph barGraph;
+    STEMBuddyStepper  stepper;
+    STEMBuddyMAX7219  matrix;
+    STEMBuddyRFID     rfid;
+    STEMBuddySwitch   sw;
 
     STEMBuddy();
 

@@ -65,6 +65,14 @@ void STEMBuddy::begin(const char* deviceName) {
     audio.begin(this);
     speech.begin(this);
     nfc.begin(this);
+    speaker.begin(this);
+    gpio.begin(this);
+    segment7.begin(this);
+    barGraph.begin(this);
+    stepper.begin(this);
+    matrix.begin(this);
+    rfid.begin(this);
+    sw.begin(this);
 
     _initialized = true;
 }
@@ -194,6 +202,24 @@ void STEMBuddy::_processMessage(const uint8_t* data, size_t len) {
         case SBCmd::SENSOR_STEPS:
             if (payloadLen >= 2) sensor._onSteps((payload[0] << 8) | payload[1]);
             break;
+        case SBCmd::SENSOR_GPS_LAT:
+            if (payloadLen >= 4) sensor._onGpsLat(((int32_t)payload[0] << 24) | ((int32_t)payload[1] << 16) | ((int32_t)payload[2] << 8) | payload[3]);
+            break;
+        case SBCmd::SENSOR_GPS_LNG:
+            if (payloadLen >= 4) sensor._onGpsLng(((int32_t)payload[0] << 24) | ((int32_t)payload[1] << 16) | ((int32_t)payload[2] << 8) | payload[3]);
+            break;
+        case SBCmd::SENSOR_GPS_ALT:
+            if (payloadLen >= 2) sensor._onGpsAlt((payload[0] << 8) | payload[1]);
+            break;
+        case SBCmd::SENSOR_GPS_SPEED:
+            if (payloadLen >= 2) sensor._onGpsSpeed((payload[0] << 8) | payload[1]);
+            break;
+        case SBCmd::SENSOR_COLOR_RGB:
+            if (payloadLen >= 3) sensor._onColorRGB(payload[0], payload[1], payload[2]);
+            break;
+        case SBCmd::SENSOR_COLOR_GRID:
+            if (payloadLen >= 5) sensor._onColorGrid(payload[0], payload[1], payload[2], payload[3], payload[4]);
+            break;
 
         // Virtual button/input from app
         case SBCmd::BUTTON_STATE:
@@ -285,6 +311,14 @@ void STEMBuddy::_processMessage(const uint8_t* data, size_t len) {
             break;
         case SBCmd::NFC_TAG_REMOVED:
             nfc._onTagRemoved();
+            break;
+
+        // RFID card data from app
+        case SBCmd::RFID_CARD_UID:
+            if (payloadLen >= 4) rfid._onCardUID(payload, payloadLen);
+            break;
+        case SBCmd::RFID_CARD_REMOVED:
+            rfid._onCardRemoved();
             break;
     }
 }

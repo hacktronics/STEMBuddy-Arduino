@@ -39,7 +39,14 @@ public:
         _gyroX(0), _gyroY(0), _gyroZ(0),
         _magX(0), _magY(0), _magZ(0),
         _proximity(0), _sound(0), _steps(0),
-        _updated(false) {}
+        _gpsLat(0), _gpsLng(0), _gpsAlt(0), _gpsSpeed(0),
+        _colorR(0), _colorG(0), _colorB(0),
+        _gridSize(0),
+        _updated(false) {
+        memset(_gridR, 0, sizeof(_gridR));
+        memset(_gridG, 0, sizeof(_gridG));
+        memset(_gridB, 0, sizeof(_gridB));
+    }
     void begin(STEMBuddy* parent) { _parent = parent; }
 
     // ─── Environment Sensors ─────────────────────────────────────
@@ -96,6 +103,43 @@ public:
     /** Step count since connection started. */
     uint16_t steps() { return _steps; }
 
+    // ─── GPS Sensors ──────────────────────────────────────────────
+
+    /** GPS latitude in degrees. */
+    float gpsLatitude() { return _gpsLat / 10000.0f; }
+
+    /** GPS longitude in degrees. */
+    float gpsLongitude() { return _gpsLng / 10000.0f; }
+
+    /** GPS altitude in meters. */
+    uint16_t gpsAltitude() { return _gpsAlt; }
+
+    /** GPS speed in km/h. */
+    float gpsSpeed() { return _gpsSpeed / 10.0f; }
+
+    // ─── Color Sensor ─────────────────────────────────────────────
+
+    /** Color sensor red component (0-255). */
+    uint8_t colorR() { return _colorR; }
+
+    /** Color sensor green component (0-255). */
+    uint8_t colorG() { return _colorG; }
+
+    /** Color sensor blue component (0-255). */
+    uint8_t colorB() { return _colorB; }
+
+    /** Color grid size (1, 3, or 5). */
+    uint8_t colorGridSize() { return _gridSize; }
+
+    /** Get color at a grid cell. Returns RGB via out parameters. */
+    void colorGridCell(uint8_t cellIndex, uint8_t &r, uint8_t &g, uint8_t &b) {
+        if (cellIndex < 25) {
+            r = _gridR[cellIndex]; g = _gridG[cellIndex]; b = _gridB[cellIndex];
+        } else {
+            r = 0; g = 0; b = 0;
+        }
+    }
+
     // ─── Convenience Methods ─────────────────────────────────────
 
     /** Compass heading in degrees (0-360, 0=North). Uses magnetometer X/Y. */
@@ -145,6 +189,13 @@ private:
     uint16_t _proximity;    // cm
     uint16_t _sound;        // x10 (dB)
     uint16_t _steps;        // count
+    int32_t  _gpsLat;       // x10000 (degrees)
+    int32_t  _gpsLng;       // x10000 (degrees)
+    uint16_t _gpsAlt;       // meters
+    uint16_t _gpsSpeed;     // x10 (km/h)
+    uint8_t  _colorR, _colorG, _colorB; // 0-255
+    uint8_t  _gridSize;                // 1, 3, or 5
+    uint8_t  _gridR[25], _gridG[25], _gridB[25]; // max 5x5 grid
 
     bool _updated;
 
@@ -174,6 +225,20 @@ private:
     void _onProximity(uint16_t raw) { _proximity = raw; _updated = true; }
     void _onSound(uint16_t raw)     { _sound = raw; _updated = true; }
     void _onSteps(uint16_t raw)     { _steps = raw; _updated = true; }
+    void _onGpsLat(int32_t raw)     { _gpsLat = raw; _updated = true; }
+    void _onGpsLng(int32_t raw)     { _gpsLng = raw; _updated = true; }
+    void _onGpsAlt(uint16_t raw)    { _gpsAlt = raw; _updated = true; }
+    void _onGpsSpeed(uint16_t raw)  { _gpsSpeed = raw; _updated = true; }
+    void _onColorRGB(uint8_t r, uint8_t g, uint8_t b) {
+        _colorR = r; _colorG = g; _colorB = b; _updated = true;
+    }
+    void _onColorGrid(uint8_t gridSize, uint8_t cellIndex, uint8_t r, uint8_t g, uint8_t b) {
+        _gridSize = gridSize;
+        if (cellIndex < 25) {
+            _gridR[cellIndex] = r; _gridG[cellIndex] = g; _gridB[cellIndex] = b;
+        }
+        _updated = true;
+    }
 };
 
 #endif
