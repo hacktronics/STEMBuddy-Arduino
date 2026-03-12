@@ -21,9 +21,10 @@ void STEMBuddyPiano::allOff() {
     _parent->sendCommand(SBCmd::PIANO_ALL_OFF);
 }
 
-void STEMBuddyPiano::setInstrument(uint8_t type) {
+void STEMBuddyPiano::setInstrument(Instrument type) {
     if (!_parent) return;
-    if (type > 3) type = 3;
-    uint8_t data[] = { type };
+    uint8_t val = static_cast<uint8_t>(type);
+    if (val > 3) val = 3;
+    uint8_t data[] = { val };
     _parent->sendCommand(SBCmd::PIANO_SET_INSTRUMENT, data, 1);
 }

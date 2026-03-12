@@ -9,7 +9,7 @@
  *   buddy.piano.noteOn(60, 100);     // Play middle C (MIDI 60), velocity 100
  *   buddy.piano.noteOff(60);         // Stop middle C
  *   buddy.piano.allOff();            // Stop all notes
- *   buddy.piano.setInstrument(0);    // 0=piano, 1=organ, 2=synth, 3=music box
+ *   buddy.piano.setInstrument(STEMBuddyPiano::PIANO);  // Named constants
  *
  * Reading user key presses:
  *   if (buddy.piano.available()) {
@@ -29,6 +29,14 @@ class STEMBuddyPiano {
     friend class STEMBuddy;
 
 public:
+    /** Instrument/sound type constants for setInstrument(). */
+    enum Instrument : uint8_t {
+        PIANO     = 0,
+        ORGAN     = 1,
+        SYNTH     = 2,
+        MUSIC_BOX = 3
+    };
+
     STEMBuddyPiano() : _parent(nullptr), _lastNote(0), _lastVelocity(0),
                         _lastPressed(false), _available(false) {}
     void begin(STEMBuddy* parent) { _parent = parent; }
@@ -51,9 +59,9 @@ public:
 
     /**
      * Set the instrument/sound type.
-     * @param type  0=piano, 1=organ, 2=synth, 3=music box
+     * @param type  Instrument enum: PIANO, ORGAN, SYNTH, MUSIC_BOX
      */
-    void setInstrument(uint8_t type);
+    void setInstrument(Instrument type);
 
     // ─── Reading user key presses from app ────────────────────────
 

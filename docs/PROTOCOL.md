@@ -143,7 +143,7 @@ Phone sensors or generated values sent TO the ESP32.
 | 56 | `C238` | `BUTTON_STATE` | `[button_id, state]` | Button 0–7, state: 0=released, 1=pressed |
 | 57 | `C239` | `SLIDER_VALUE` | `[slider_id, value]` | Slider 0–3, value: 0–255 |
 | 58 | `C23A` | `TOUCHPAD_XY` | `[x_hi, x_lo, y_hi, y_lo]` | Touch position (0–1000 range) |
-| 59 | `C23B` | `DPAD_STATE` | `[direction]` | 0=none, 1=up, 2=right, 3=down, 4=left |
+| 59 | `C23B` | `DPAD_STATE` | `[direction]` | 0=none, 1=up, 2=right, 3=down, 4=left. Use `STEMBuddyInput::DPAD_UP` etc. |
 | 60 | `C23C` | `KEYPAD_STATE` | `[key_char]` | ASCII code of pressed key (0=released). Keys: '0'–'9', '*', '#', 'A'–'D' |
 
 ### TTS / Speech (0xC23D–0xC240) — ESP32 → App
@@ -170,7 +170,7 @@ Phone sensors or generated values sent TO the ESP32.
 | 68 | `C244` | `GPIO_PIN_STATE` | `[pin, state, mode]` | Pin digital state. mode: 0=input, 1=output |
 | 69 | `C245` | `GPIO_ANALOG_VALUE` | `[pin, value_hi, value_lo]` | Pin analog value (12-bit ADC) |
 
-### Home Automation / Switch (0xC246–0xC248)
+### Home Automation / Switch / Relay (0xC246–0xC248)
 
 | # | Hex | Name | Direction | Data | Description |
 |---|-----|------|-----------|------|-------------|
@@ -178,16 +178,20 @@ Phone sensors or generated values sent TO the ESP32.
 | 71 | `C247` | `SWITCH_TOGGLE` | ESP32 → App | `[switch_id]` | Toggle switch 0–7 |
 | 72 | `C248` | `SWITCH_CONTROL` | App → ESP32 | `[switch_id, state]` | User toggled switch |
 
+> **Relay**: The `buddy.relay` class provides a relay-friendly API (`on()`, `off()`, `toggle()`) that uses the same SWITCH_SET/SWITCH_TOGGLE commands under the hood. Default relay ID is 0.
+
 ### 7-Segment Display (0xC249–0xC24E) — ESP32 → App
 
 | # | Hex | Name | Data | Description |
 |---|-----|------|------|-------------|
-| 73 | `C249` | `SEG7_SET_VALUE` | `[d0, d1, d2, d3]` | Set digit values (0–9, 0xFF=blank) |
+| 73 | `C249` | `SEG7_SET_VALUE` | `[d0, d1, d2, d3]` | Set digit values (0–9, 0x0A=minus, 0xFF=blank) |
 | 74 | `C24A` | `SEG7_SET_RAW` | `[seg0...seg7]` | Set raw segment bits per digit |
 | 75 | `C24B` | `SEG7_SET_DECIMAL` | `[bitmask]` | Which digits show decimal point (bit0=digit0) |
 | 76 | `C24C` | `SEG7_SET_COLON` | `[0\|1]` | Colon on/off |
 | 77 | `C24D` | `SEG7_SET_COLOR` | `[R, G, B]` | Segment color |
 | 78 | `C24E` | `SEG7_CLEAR` | — | Blank all digits |
+
+> **showNumber()**: The C++ library provides `buddy.segment7.showNumber(int)` and `showNumber(float)` convenience methods that automatically decompose numbers into right-aligned digits with leading blanks, negative signs (digit value 0x0A = segment G only), and auto decimal points. Uses `SEG7_SET_VALUE` + `SEG7_SET_DECIMAL` under the hood.
 
 ### LED Bar Graph (0xC24F–0xC252) — ESP32 → App
 
@@ -196,7 +200,7 @@ Phone sensors or generated values sent TO the ESP32.
 | 79 | `C24F` | `BAR_SET` | `[index, value]` | Set single LED (0=off, 1=on) |
 | 80 | `C250` | `BAR_SET_ALL` | `[v0...v9]` | Set all 10 LEDs (0 or 1 each) |
 | 81 | `C251` | `BAR_CLEAR` | — | Turn all off |
-| 82 | `C252` | `BAR_SET_COLOR` | `[colorIndex]` | 0=green, 1=red, 2=yellow, 3=blue |
+| 82 | `C252` | `BAR_SET_COLOR` | `[colorIndex]` | GREEN=0, RED=1, YELLOW=2, BLUE=3 (use `STEMBuddyBarGraph::Color` enum) |
 
 ### Stepper Motor (0xC253–0xC256) — ESP32 → App
 
@@ -229,10 +233,10 @@ Phone sensors or generated values sent TO the ESP32.
 
 | # | Hex | Name | Data | Description |
 |---|-----|------|------|-------------|
-| 95 | `C25F` | `SPEAKER_NOTE` | `[freq_hi, freq_lo, dur_hi, dur_lo, waveform]` | Play note with waveform type |
+| 95 | `C25F` | `SPEAKER_NOTE` | `[freq_hi, freq_lo, dur_hi, dur_lo, waveform]` | Play note with waveform type (`STEMBuddySpeaker::Waveform` enum) |
 | 96 | `C260` | `SPEAKER_STOP` | — | Stop playback |
 | 97 | `C261` | `SPEAKER_SET_VOLUME` | `[volume]` | Volume 0–100 |
-| 98 | `C262` | `SPEAKER_SET_WAVEFORM` | `[type]` | 0=sine, 1=square, 2=sawtooth, 3=triangle |
+| 98 | `C262` | `SPEAKER_SET_WAVEFORM` | `[type]` | `STEMBuddySpeaker::Waveform` enum: SINE=0, SQUARE=1, SAWTOOTH=2, TRIANGLE=3 |
 
 ### Camera (0xC263–0xC266)
 
@@ -240,7 +244,7 @@ Phone sensors or generated values sent TO the ESP32.
 |---|-----|------|-----------|------|-------------|
 | 99 | `C263` | `CAMERA_CAPTURE` | ESP32 → App | — | Trigger photo capture |
 | 100 | `C264` | `CAMERA_SET_QUALITY` | ESP32 → App | `[quality]` | JPEG quality 10–100 |
-| 101 | `C265` | `CAMERA_SET_FLASH` | ESP32 → App | `[mode]` | 0=off, 1=on, 2=auto |
+| 101 | `C265` | `CAMERA_SET_FLASH` | ESP32 → App | `[mode]` | OFF=0, ON=1, AUTO=2 (use `STEMBuddyCamera::OFF/ON/AUTO`) |
 | 102 | `C266` | `CAMERA_STATUS` | App → ESP32 | `[status]` | 0=idle, 1=capturing, 2=captured, 3=error |
 
 ### Notifications (0xC267–0xC26A) — ESP32 → App
@@ -267,7 +271,7 @@ Phone sensors or generated values sent TO the ESP32.
 | 110 | `C26E` | `PIANO_NOTE_ON` | ESP32 → App | `[note, velocity]` | Play MIDI note (0–127), velocity (0–127) |
 | 111 | `C26F` | `PIANO_NOTE_OFF` | ESP32 → App | `[note]` | Stop MIDI note |
 | 112 | `C270` | `PIANO_ALL_OFF` | ESP32 → App | — | Stop all notes |
-| 113 | `C271` | `PIANO_SET_INSTRUMENT` | ESP32 → App | `[type]` | 0=piano, 1=organ, 2=synth, 3=music box |
+| 113 | `C271` | `PIANO_SET_INSTRUMENT` | ESP32 → App | `[type]` | Instrument enum: PIANO=0, ORGAN=1, SYNTH=2, MUSIC_BOX=3 |
 | 114 | `C272` | `PIANO_KEY_PRESS` | App → ESP32 | `[note, velocity]` | User pressed key |
 | 115 | `C273` | `PIANO_KEY_RELEASE` | App → ESP32 | `[note]` | User released key |
 

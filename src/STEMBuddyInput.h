@@ -12,7 +12,8 @@
  *   }
  *
  *   uint8_t speed = buddy.input.slider(0);  // Read slider 0 (0-255)
- *   uint8_t dpad = buddy.input.dpad();       // 0=none, 1=up, 2=right, 3=down, 4=left
+ *   uint8_t dpad = buddy.input.dpad();
+ *   if (dpad == STEMBuddyInput::DPAD_UP) { ... }
  *
  *   // Membrane Keypad (4x4: 1-9, 0, *, #, A-D)
  *   if (buddy.input.keypadPressed()) {
@@ -34,6 +35,13 @@ class STEMBuddyInput {
     friend class STEMBuddy;
 
 public:
+    /** D-pad direction constants — use these instead of raw numbers. */
+    static const uint8_t DPAD_NONE  = 0;
+    static const uint8_t DPAD_UP    = 1;
+    static const uint8_t DPAD_RIGHT = 2;
+    static const uint8_t DPAD_DOWN  = 3;
+    static const uint8_t DPAD_LEFT  = 4;
+
     STEMBuddyInput() : _parent(nullptr), _dpadState(0), _touchX(0), _touchY(0), _keypadKey(0) {
         memset(_buttons, 0, sizeof(_buttons));
         memset(_sliders, 0, sizeof(_sliders));
@@ -51,7 +59,7 @@ public:
         return (id < 4) ? _sliders[id] : 0;
     }
 
-    /** Read D-pad state: 0=none, 1=up, 2=right, 3=down, 4=left. */
+    /** Read D-pad state. Compare with DPAD_UP, DPAD_DOWN, DPAD_LEFT, DPAD_RIGHT, DPAD_NONE. */
     uint8_t dpad() { return _dpadState; }
 
     /** Touchpad X position (0-1000). */
@@ -63,6 +71,16 @@ public:
     /** Read switch state (id: 0-7). Returns true if ON. */
     bool switchState(uint8_t id) {
         return (id < 8) ? _switches[id] : false;
+    }
+
+    /** Reset all input state to defaults (used by HIL test harness). */
+    void reset() {
+        memset(_buttons, 0, sizeof(_buttons));
+        memset(_switches, 0, sizeof(_switches));
+        memset(_sliders, 0, sizeof(_sliders));
+        _dpadState = 0;
+        _touchX = 0; _touchY = 0;
+        _keypadKey = 0;
     }
 
     /** Check if a keypad key is currently pressed. */

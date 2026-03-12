@@ -58,6 +58,9 @@
 #include "STEMBuddyMAX7219.h"
 #include "STEMBuddyRFID.h"
 #include "STEMBuddySwitch.h"
+#include "STEMBuddyRelay.h"
+#include "STEMBuddyOLED.h"
+#include "STEMBuddySD.h"
 
 class STEMBuddy : public BLEServerCallbacks, public BLECharacteristicCallbacks {
 public:
@@ -89,6 +92,9 @@ public:
     STEMBuddyMAX7219  matrix;
     STEMBuddyRFID     rfid;
     STEMBuddySwitch   sw;
+    STEMBuddyRelay    relay;
+    STEMBuddyOLED     oled;
+    STEMBuddySD       sd;
 
     STEMBuddy();
 
@@ -135,7 +141,8 @@ private:
     BLEServer*          _server;
     BLECharacteristic*  _txChar;   // ESP32 sends TO app
     BLECharacteristic*  _rxChar;   // ESP32 receives FROM app
-    bool                _connected;
+    bool                _bleConnected;   // BLE link is up
+    bool                _appReady;       // App has subscribed & sent PONG handshake
     bool                _initialized;
 
     void _processMessage(const uint8_t* data, size_t len);

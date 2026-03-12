@@ -130,7 +130,7 @@ constexpr uint16_t SWITCH_TOGGLE    = 0xC247;  // ESP32 → App: [switch_id 0-7]
 constexpr uint16_t SWITCH_CONTROL   = 0xC248;  // App → ESP32: [switch_id 0-7] [state 0/1]
 
 // ─── 7-Segment Display ─ ESP32 → App ──────────────────────────────
-constexpr uint16_t SEG7_SET_VALUE   = 0xC249;  // Data: [d0, d1, d2, d3] (0-9, 0xFF=blank)
+constexpr uint16_t SEG7_SET_VALUE   = 0xC249;  // Data: [d0, d1, d2, d3] (0-9, 0x0A=minus, 0xFF=blank)
 constexpr uint16_t SEG7_SET_RAW     = 0xC24A;  // Data: [seg0..seg7] raw segment bits
 constexpr uint16_t SEG7_SET_DECIMAL = 0xC24B;  // Data: [bitmask]
 constexpr uint16_t SEG7_SET_COLON   = 0xC24C;  // Data: [0|1]
@@ -170,7 +170,7 @@ constexpr uint16_t SPEAKER_SET_WAVEFORM = 0xC262; // Data: [type] 0=sine, 1=squa
 // ─── Camera ─ ESP32 → App / App → ESP32 ───────────────────────────
 constexpr uint16_t CAMERA_CAPTURE   = 0xC263;  // ESP32 → App: trigger capture
 constexpr uint16_t CAMERA_SET_QUALITY = 0xC264; // ESP32 → App: [quality 10-100]
-constexpr uint16_t CAMERA_SET_FLASH = 0xC265;  // ESP32 → App: [mode] 0=off, 1=on, 2=auto
+constexpr uint16_t CAMERA_SET_FLASH = 0xC265;  // ESP32 → App: [mode] OFF=0, ON=1, AUTO=2
 constexpr uint16_t CAMERA_STATUS    = 0xC266;  // App → ESP32: [status]
 
 // ─── Notifications ─ ESP32 → App ──────────────────────────────────
@@ -233,6 +233,34 @@ constexpr uint16_t NFC_NDEF_TEXT    = 0xC290;  // Data: [char0..charN]
 constexpr uint16_t NFC_NDEF_URI     = 0xC291;  // Data: [char0..charN]
 constexpr uint16_t NFC_NDEF_END     = 0xC292;  // No data
 constexpr uint16_t NFC_TAG_REMOVED  = 0xC293;  // No data
+
+// ─── SSD1306 OLED ─ ESP32 → App ──────────────────────────────────
+constexpr uint16_t OLED_CLEAR       = 0xC294;  // No data — clear framebuffer
+constexpr uint16_t OLED_PRINT       = 0xC295;  // Data: [char0...charN] text at cursor (chunked, max 18)
+constexpr uint16_t OLED_SET_CURSOR  = 0xC296;  // Data: [x, y] pixel position
+constexpr uint16_t OLED_SET_TEXT_SIZE = 0xC297; // Data: [size] 1-4
+constexpr uint16_t OLED_DRAW_PIXEL  = 0xC298;  // Data: [x, y, color] color: 0=off, 1=on
+constexpr uint16_t OLED_DRAW_LINE   = 0xC299;  // Data: [x0, y0, x1, y1]
+constexpr uint16_t OLED_DRAW_RECT   = 0xC29A;  // Data: [x, y, w, h, fill] fill: 0=outline, 1=filled
+constexpr uint16_t OLED_DRAW_CIRCLE = 0xC29B;  // Data: [cx, cy, r, fill] fill: 0=outline, 1=filled
+constexpr uint16_t OLED_INVERT      = 0xC29C;  // Data: [0|1] invert display
+constexpr uint16_t OLED_DISPLAY     = 0xC29D;  // No data — flush framebuffer to display
+
+// ─── MicroSD Virtual Storage ─ ESP32 → App / App → ESP32 ─────
+constexpr uint16_t SD_FILE_NAME       = 0xC29E;  // ESP32 → App: [char0...charN] filename chunk (max 18)
+constexpr uint16_t SD_FILE_WRITE      = 0xC29F;  // ESP32 → App: [char0...charN] file data chunk
+constexpr uint16_t SD_FILE_WRITE_END  = 0xC2A0;  // ESP32 → App: no data — flush write
+constexpr uint16_t SD_FILE_READ       = 0xC2A1;  // ESP32 → App: no data — request file content
+constexpr uint16_t SD_FILE_DATA       = 0xC2A2;  // App → ESP32: [char0...charN] file data chunk
+constexpr uint16_t SD_FILE_DATA_END   = 0xC2A3;  // App → ESP32: no data — end of file data
+constexpr uint16_t SD_FILE_DELETE     = 0xC2A4;  // ESP32 → App: no data — delete named file
+constexpr uint16_t SD_FILE_EXISTS     = 0xC2A5;  // ESP32 → App: no data — check if file exists
+constexpr uint16_t SD_FILE_STATUS     = 0xC2A6;  // App → ESP32: [exists, sizeHi, sizeMid, sizeLo]
+constexpr uint16_t SD_FILE_LIST_REQ   = 0xC2A7;  // ESP32 → App: no data — request file listing
+constexpr uint16_t SD_FILE_LIST_ENTRY = 0xC2A8;  // App → ESP32: [char0...charN] filename chunk
+constexpr uint16_t SD_FILE_LIST_END   = 0xC2A9;  // App → ESP32: no data — end of listing
+constexpr uint16_t SD_FILE_APPEND     = 0xC2AA;  // ESP32 → App: [char0...charN] append data chunk
+constexpr uint16_t SD_FILE_APPEND_END = 0xC2AB;  // ESP32 → App: no data — flush appended data
 
 // ─── Component Type IDs (for REGISTER command) ────────────────────
 constexpr uint8_t COMPONENT_LED     = 0x01;

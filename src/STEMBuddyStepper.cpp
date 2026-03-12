@@ -1,10 +1,12 @@
 #include "STEMBuddy.h"
 
-void STEMBuddyStepper::step(uint16_t steps, uint8_t direction) {
+void STEMBuddyStepper::step(int16_t steps) {
     if (!_parent) return;
+    uint8_t dir = (steps < 0) ? COUNTER_CLOCKWISE : CLOCKWISE;
+    uint16_t absSteps = (uint16_t)abs(steps);
     uint8_t data[3] = {
-        (uint8_t)(steps >> 8), (uint8_t)(steps & 0xFF),
-        (uint8_t)(direction & 0x01)
+        (uint8_t)(absSteps >> 8), (uint8_t)(absSteps & 0xFF),
+        dir
     };
     _parent->sendCommand(SBCmd::STEPPER_STEP, data, 3);
 }

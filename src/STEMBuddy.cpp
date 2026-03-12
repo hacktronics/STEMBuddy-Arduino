@@ -9,7 +9,7 @@
 
 STEMBuddy::STEMBuddy()
     : _server(nullptr), _txChar(nullptr), _rxChar(nullptr),
-      _connected(false), _initialized(false) {}
+      _bleConnected(false), _appReady(false), _initialized(false) {}
 
 void STEMBuddy::begin(const char* deviceName) {
     if (_initialized) return;
@@ -73,6 +73,9 @@ void STEMBuddy::begin(const char* deviceName) {
     matrix.begin(this);
     rfid.begin(this);
     sw.begin(this);
+    relay.begin(this);
+    oled.begin(this);
+    sd.begin(this);
 
     _initialized = true;
 }
@@ -84,7 +87,9 @@ void STEMBuddy::update() {
 }
 
 bool STEMBuddy::isConnected() {
-    return _connected;
+    // Only true after app has subscribed to notifications and sent PONG handshake.
+    // This prevents commands being sent before the app is ready to receive them.
+    return _bleConnected && _appReady;
 }
 
 void STEMBuddy::reset() {
@@ -92,7 +97,7 @@ void STEMBuddy::reset() {
 }
 
 void STEMBuddy::sendCommand(uint16_t command, const uint8_t* data, uint8_t len) {
-    if (!_connected || !_txChar) return;
+    if (!_bleConnected || !_txChar) return;
 
     uint8_t packet[20]; // BLE default MTU
     packet[0] = (command >> 8) & 0xFF;
@@ -124,19 +129,21 @@ void STEMBuddy::sendChunked(uint16_t command, const char* text) {
 // ─── BLE Callbacks ─────────────────────────────────────────────────
 
 void STEMBuddy::onConnect(BLEServer* pServer) {
-    _connected = true;
+    _bleConnected = true;
+    _appReady = false;  // Wait for PONG handshake from app
 }
 
 void STEMBuddy::onDisconnect(BLEServer* pServer) {
-    _connected = false;
+    _bleConnected = false;
+    _appReady = false;
     // Restart advertising so the app can reconnect
     BLEDevice::startAdvertising();
 }
 
 void STEMBuddy::onWrite(BLECharacteristic* pCharacteristic) {
-    std::string value = pCharacteristic->getValue();
+    String value = pCharacteristic->getValue();
     if (value.length() >= 2) {
-        _processMessage((const uint8_t*)value.data(), value.length());
+        _processMessage((const uint8_t*)value.c_str(), value.length());
     }
 }
 
@@ -151,6 +158,11 @@ void STEMBuddy::_processMessage(const uint8_t* data, size_t len) {
         // System
         case SBCmd::PING:
             sendCommand(SBCmd::PONG);
+            break;
+        case SBCmd::PONG:
+            // App has subscribed to notifications and is ready to receive data.
+            // This completes the handshake — isConnected() now returns true.
+            _appReady = true;
             break;
 
         // Virtual sensor data from app
@@ -319,6 +331,23 @@ void STEMBuddy::_processMessage(const uint8_t* data, size_t len) {
             break;
         case SBCmd::RFID_CARD_REMOVED:
             rfid._onCardRemoved();
+            break;
+
+        // MicroSD file data from app (responses to readFile/exists/listFiles)
+        case SBCmd::SD_FILE_DATA:
+            if (payloadLen >= 1) sd._onFileData(payload, payloadLen);
+            break;
+        case SBCmd::SD_FILE_DATA_END:
+            sd._onFileDataEnd();
+            break;
+        case SBCmd::SD_FILE_STATUS:
+            if (payloadLen >= 4) sd._onFileStatus(payload, payloadLen);
+            break;
+        case SBCmd::SD_FILE_LIST_ENTRY:
+            if (payloadLen >= 1) sd._onListEntry(payload, payloadLen);
+            break;
+        case SBCmd::SD_FILE_LIST_END:
+            sd._onListEnd();
             break;
     }
 }

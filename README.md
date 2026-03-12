@@ -14,7 +14,7 @@ ESP32 (your code)  ──BLE──>  Phone (STEM Buddy app)
 
 Phone (sensors/inputs) ──BLE──>  ESP32
     Accelerometer, light      buddy.sensor.temperature()
-    Buttons, sliders, pots    buddy.input.potValue(0)
+    Buttons, sliders, dpad    buddy.input.slider(0)
 ```
 
 Your phone becomes the component. Students don't need to buy LEDs, LCDs, or sensors — just an ESP32 and the free app.
@@ -71,23 +71,25 @@ void loop() {
 | LED / RGB LED | `buddy.led` | `buddy.led.setColor(r, g, b)` |
 | LCD Display | `buddy.lcd` | `buddy.lcd.print(0, 0, "Hello!")` |
 | Servo Motor | `buddy.servo` | `buddy.servo.setAngle(90)` |
-| DC Motor | `buddy.motor` | `buddy.motor.setSpeed(200)` |
+| DC Motor | `buddy.motor` | `buddy.motor.run(200)` |
 | Buzzer | `buddy.buzzer` | `buddy.buzzer.tone(440)` |
 | Oscilloscope | `buddy.scope` | `buddy.scope.plot(value)` |
 | Text-to-Speech | `buddy.tts` | `buddy.tts.speak("Hello")` |
-| Serial Terminal | `buddy.terminal` | `buddy.terminal.send("debug info")` |
-| Notifications | `buddy.notify` | `buddy.notify.send("Alert!")` |
-| Piano | `buddy.piano` | `buddy.piano.play(60)` |
-| Audio | `buddy.audio` | `buddy.audio.play()` |
+| Serial Terminal | `buddy.terminal` | `buddy.terminal.print("debug info")` |
+| Notifications | `buddy.notify` | `buddy.notify.send("Alert!", "Details here")` |
+| Piano | `buddy.piano` | `buddy.piano.noteOn(60, 100)` |
+| Audio | `buddy.audio` | `buddy.audio.play("alert.mp3")` |
+| Relay | `buddy.relay` | `buddy.relay.on()` |
+| Home Switches | `buddy.sw` | `buddy.sw.set(0, true)` |
 
 ### Inputs (Phone → ESP32)
 
 | Component | Object | Example |
 |-----------|--------|---------|
 | Virtual Sensors | `buddy.sensor` | `buddy.sensor.temperature()` |
-| Buttons / Pots / Sliders | `buddy.input` | `buddy.input.potValue(0)` |
+| Buttons / Sliders / D-Pad | `buddy.input` | `buddy.input.slider(0)` |
 | Camera | `buddy.camera` | `buddy.camera.capture()` |
-| NFC | `buddy.nfc` | `buddy.nfc.read()` |
+| NFC | `buddy.nfc` | `buddy.nfc.tagPresent()` |
 
 ## Examples
 

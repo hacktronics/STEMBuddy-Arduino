@@ -29,6 +29,18 @@ void STEMBuddyLCD::print(const char* text) {
     print(_cursorRow, _cursorCol, text);
 }
 
+void STEMBuddyLCD::print(int value) {
+    char buf[17];
+    snprintf(buf, sizeof(buf), "%d", value);
+    print(_cursorRow, _cursorCol, buf);
+}
+
+void STEMBuddyLCD::print(float value, uint8_t decimals) {
+    char buf[17];
+    dtostrf(value, 0, decimals, buf);
+    print(_cursorRow, _cursorCol, buf);
+}
+
 void STEMBuddyLCD::print(uint8_t row, uint8_t col, int value) {
     char buf[17];
     snprintf(buf, sizeof(buf), "%d", value);

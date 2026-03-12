@@ -4,10 +4,10 @@
  * Virtual LED Bar Graph — display bar levels on the STEM Buddy app.
  *
  * Usage:
- *   buddy.barGraph.set(0, 200);             // Set bar 0 to value 200
- *   buddy.barGraph.setAll(values, 10);      // Set all 10 bars
- *   buddy.barGraph.setColor(1);             // 0=green, 1=red, 2=yellow, 3=blue
- *   buddy.barGraph.clear();                 // Turn all off
+ *   buddy.barGraph.set(0, 200);                        // Set bar 0 to value 200
+ *   buddy.barGraph.setAll(values, 10);                 // Set all 10 bars
+ *   buddy.barGraph.setColor(STEMBuddyBarGraph::RED);   // Use named color
+ *   buddy.barGraph.clear();                            // Turn all off
  */
 
 #ifndef STEMBUDDY_BARGRAPH_H
@@ -21,6 +21,14 @@ class STEMBuddyBarGraph {
     friend class STEMBuddy;
 
 public:
+    /** Bar graph color palette. */
+    enum Color : uint8_t {
+        GREEN  = 0,
+        RED    = 1,
+        YELLOW = 2,
+        BLUE   = 3
+    };
+
     STEMBuddyBarGraph() : _parent(nullptr) {}
     void begin(STEMBuddy* parent) { _parent = parent; }
 
@@ -30,8 +38,8 @@ public:
     /** Set all 10 bars at once. */
     void setAll(const uint8_t* values, uint8_t count = 10);
 
-    /** Set color palette: 0=green, 1=red, 2=yellow, 3=blue. */
-    void setColor(uint8_t colorIndex);
+    /** Set color palette using Color enum (GREEN, RED, YELLOW, BLUE). */
+    void setColor(Color color);
 
     /** Clear all bars. */
     void clear();

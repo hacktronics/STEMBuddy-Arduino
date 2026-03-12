@@ -4,7 +4,11 @@
  * Virtual 7-Segment Display — show digits on the STEM Buddy app.
  *
  * Usage:
- *   buddy.segment7.setDigits(1, 2, 3, 4);   // Show "1234"
+ *   buddy.segment7.showNumber(1234);          // Show "1234"
+ *   buddy.segment7.showNumber(25);            // Show "  25" (right-aligned)
+ *   buddy.segment7.showNumber(-5);            // Show "  -5"
+ *   buddy.segment7.showNumber(3.14);          // Show "3.14" (auto decimal)
+ *   buddy.segment7.setDigits(1, 2, 3, 4);    // Advanced: set individual digits
  *   buddy.segment7.setColon(true);            // Enable colon (clock mode)
  *   buddy.segment7.setDecimal(0b0100);        // Decimal after 3rd digit
  *   buddy.segment7.setColor(255, 0, 0);       // Red segments
@@ -25,7 +29,13 @@ public:
     STEMBuddySegment7() : _parent(nullptr) {}
     void begin(STEMBuddy* parent) { _parent = parent; }
 
-    /** Set 4-digit value. Use 0xFF for blank digit. */
+    /** Display an integer (right-aligned, leading blanks). Range: -999 to 9999. */
+    void showNumber(int num);
+
+    /** Display a float with auto decimal point. e.g. 3.14 → "3.14" */
+    void showNumber(float num);
+
+    /** Set 4-digit value. Use 0xFF for blank, 0x0A for minus sign. */
     void setDigits(uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3);
 
     /** Set raw segment bits for up to 8 digits. */

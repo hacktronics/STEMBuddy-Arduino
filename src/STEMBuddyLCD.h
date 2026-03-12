@@ -9,7 +9,9 @@
  *   buddy.lcd.print(0, 0, "Hello World!");  // Row 0, Col 0
  *   buddy.lcd.print(1, 0, "Temperature: ");
  *   buddy.lcd.setCursor(1, 13);
- *   buddy.lcd.print("25C");
+ *   buddy.lcd.print("25C");                 // Print text at cursor
+ *   buddy.lcd.print(42);                    // Print int at cursor
+ *   buddy.lcd.print(3.14);                  // Print float at cursor
  */
 
 #ifndef STEMBUDDY_LCD_H
@@ -32,6 +34,12 @@ public:
 
     /** Print text at current cursor position. */
     void print(const char* text);
+
+    /** Print a number at current cursor position. */
+    void print(int value);
+
+    /** Print a float at current cursor position. */
+    void print(float value, uint8_t decimals = 2);
 
     /** Print a number at specific position. */
     void print(uint8_t row, uint8_t col, int value);

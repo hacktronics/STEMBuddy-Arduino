@@ -1,6 +1,17 @@
 #include "STEMBuddyMotor.h"
 #include "STEMBuddy.h"
 
+void STEMBuddyMotor::run(int16_t speed) {
+    if (!_parent) return;
+    if (speed == 0) {
+        stop();
+        return;
+    }
+    setDirection(speed > 0 ? CLOCKWISE : COUNTER_CLOCKWISE);
+    int16_t absSpeed = abs(speed);
+    setSpeed((uint8_t)(absSpeed > 255 ? 255 : absSpeed));
+}
+
 void STEMBuddyMotor::setSpeed(uint8_t speed) {
     if (!_parent) return;
     uint8_t data[] = { speed };

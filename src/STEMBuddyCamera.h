@@ -5,9 +5,9 @@
  * The STEM Buddy app captures a photo when commanded and reports status.
  *
  * Usage:
- *   buddy.camera.capture();        // Trigger photo capture
- *   buddy.camera.setQuality(90);   // JPEG quality 10-100
- *   buddy.camera.setFlash(0);      // 0=off, 1=on, 2=auto
+ *   buddy.camera.capture();                        // Trigger photo capture
+ *   buddy.camera.setQuality(90);                   // JPEG quality 10-100
+ *   buddy.camera.setFlash(STEMBuddyCamera::AUTO);  // OFF, ON, or AUTO
  *
  *   // Check status (updated by app via BLE)
  *   uint8_t s = buddy.camera.status();
@@ -25,6 +25,9 @@ class STEMBuddyCamera {
     friend class STEMBuddy;
 
 public:
+    /** Flash mode constants for setFlash(). */
+    enum Flash : uint8_t { OFF = 0, ON = 1, AUTO = 2 };
+
     STEMBuddyCamera() : _parent(nullptr), _status(0) {}
     void begin(STEMBuddy* parent) { _parent = parent; }
 
@@ -36,7 +39,7 @@ public:
 
     /**
      * Set flash mode.
-     * @param mode  0=off, 1=on, 2=auto
+     * @param mode  Flash::OFF, Flash::ON, or Flash::AUTO
      */
     void setFlash(uint8_t mode);
 
